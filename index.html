@@ -1,0 +1,397 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA OS</title><style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #050505;
+    color: #f5f5f5;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 7%;
+    border-bottom: 1px solid #3b1717;
+}
+
+.logo {
+    color: #ff3535;
+    font-size: 26px;
+    font-weight: bold;
+    letter-spacing: 4px;
+}
+
+.status {
+    color: #35ff9b;
+    font-size: 12px;
+}
+
+main {
+    width: 90%;
+    max-width: 800px;
+    margin: 45px auto;
+    text-align: center;
+}
+
+h1 {
+    color: #ff3838;
+    font-size: clamp(32px, 7vw, 55px);
+    letter-spacing: 8px;
+    text-shadow: 0 0 20px #ff202055;
+}
+
+.subtitle {
+    color: #aaa;
+    margin-top: 12px;
+    letter-spacing: 3px;
+    font-size: 12px;
+}
+
+.reactor {
+    width: 190px;
+    height: 190px;
+    border: 3px solid #ff3434;
+    border-radius: 50%;
+    margin: 45px auto 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 20px #ff222244, inset 0 0 25px #ff222222;
+    animation: glow 3s infinite alternate;
+}
+
+.reactor-inner {
+    width: 125px;
+    height: 125px;
+    border: 4px solid #ffc44d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffc44d;
+    font-size: 27px;
+    font-weight: bold;
+    box-shadow: 0 0 25px #ffbb3355;
+}
+
+@keyframes glow {
+    from { transform: scale(1); }
+    to { transform: scale(1.04); }
+}
+
+#micButton {
+    background: linear-gradient(135deg, #ff3333, #a90000);
+    color: white;
+    border: 1px solid #ff7777;
+    border-radius: 50px;
+    padding: 17px 35px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 0 20px #ff222233;
+}
+
+#micButton:hover {
+    box-shadow: 0 0 30px #ff222288;
+}
+
+#micButton:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+#message {
+    margin: 25px auto;
+    color: #ffc44d;
+    min-height: 25px;
+    line-height: 1.6;
+}
+
+.panel {
+    margin-top: 35px;
+    padding: 22px;
+    border: 1px solid #4a2424;
+    background: #101010;
+    border-radius: 12px;
+    text-align: left;
+}
+
+.panel h2 {
+    color: #ff4545;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+#history {
+    color: #bbb;
+    font-size: 14px;
+    line-height: 2;
+    overflow-wrap: anywhere;
+}
+
+.commands {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.commands button {
+    background: #191919;
+    border: 1px solid #633030;
+    border-radius: 6px;
+    padding: 10px 13px;
+    color: #eee;
+    cursor: pointer;
+}
+
+.commands button:hover {
+    border-color: #ff4545;
+}
+
+footer {
+    text-align: center;
+    color: #666;
+    padding: 30px 10px;
+    font-size: 12px;
+}
+
+@media (max-width: 500px) {
+    header { padding: 18px 5%; }
+    .logo { font-size: 21px; }
+    main { margin-top: 35px; }
+    .reactor { width: 160px; height: 160px; }
+    .reactor-inner { width: 105px; height: 105px; }
+}
+</style></head><body><header>
+    <div class="logo">NOVA OS</div>
+    <div class="status">● SYSTEM ONLINE</div>
+</header><main>
+    <h1>NOVA</h1>
+    <p class="subtitle">YOUR PERSONAL VOICE ASSISTANT</p><div class="reactor">
+    <div class="reactor-inner">N</div>
+</div>
+
+<button id="micButton" onclick="listen()">🎙️ ACTIVATE NOVA</button>
+
+<p id="message">Hello! I'm NOVA. Press the button and speak.</p>
+
+<section class="panel">
+    <h2>QUICK COMMANDS</h2>
+    <div class="commands">
+        <button onclick="runCommand('What time is it?')">🕒 Time</button>
+        <button onclick="runCommand('What is today’s date?')">📅 Date</button>
+        <button onclick="runCommand('Open YouTube')">▶ YouTube</button>
+        <button onclick="runCommand('Open Google')">🌐 Google</button>
+        <button onclick="runCommand('Help')">❔ Help</button>
+    </div>
+</section>
+
+<section class="panel">
+    <h2>COMMAND HISTORY</h2>
+    <div id="history">Your commands will appear here.</div>
+</section>
+
+</main><footer>
+    NOVA OS · PERSONAL ASSISTANT INTERFACE
+</footer><script>
+const message = document.getElementById("message");
+const historyBox = document.getElementById("history");
+const micButton = document.getElementById("micButton");
+
+let commandHistory = [];
+
+function speak(text) {
+    message.textContent = text;
+
+    if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+
+        const speech = new SpeechSynthesisUtterance(text);
+        speech.lang = "en-US";
+        speech.rate = 1;
+        speech.pitch = 1;
+
+        window.speechSynthesis.speak(speech);
+    }
+}
+
+function addHistory(command, response) {
+    commandHistory.unshift("You: " + command + "<br>NOVA: " + response);
+    commandHistory = commandHistory.slice(0, 5);
+
+    historyBox.innerHTML = commandHistory.join("<br><br>");
+}
+
+function runCommand(input) {
+    const command = input.toLowerCase().trim();
+    let response = "";
+
+    if (command.includes("hello") || command.includes("hi nova")) {
+        response = "Hello! I'm NOVA. How can I help you?";
+    }
+
+    else if (command.includes("time")) {
+        response = "The time is " +
+            new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+    }
+
+    else if (command.includes("date") || command.includes("day is it")) {
+        response = "Today is " +
+            new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            });
+    }
+
+    else if (command.includes("open youtube")) {
+        response = "Opening YouTube.";
+        speak(response);
+        addHistory(input, response);
+        window.open("https://www.youtube.com/", "_blank");
+        return;
+    }
+
+    else if (command.includes("open google")) {
+        response = "Opening Google.";
+        speak(response);
+        addHistory(input, response);
+        window.open("https://www.google.com/", "_blank");
+        return;
+    }
+
+    else if (command.includes("search for ")) {
+        const query = input.substring(
+            input.toLowerCase().indexOf("search for ") + 11
+        );
+
+        if (!query.trim()) {
+            response = "Please tell me what you want to search for.";
+        } else {
+            response = "Searching Google for " + query;
+            speak(response);
+            addHistory(input, response);
+            window.open(
+                "https://www.google.com/search?q=" +
+                encodeURIComponent(query),
+                "_blank"
+            );
+            return;
+        }
+    }
+
+    else if (command.includes("calculate ") || command.includes("what is ")) {
+        const expression = input
+            .replace(/calculate/i, "")
+            .replace(/what is/i, "")
+            .trim();
+
+        const result = calculate(expression);
+
+        if (result !== null) {
+            response = "The answer is " + result;
+        } else {
+            response = "I couldn't calculate that. Try something like calculate 12 plus 5.";
+        }
+    }
+
+    else if (command.includes("help")) {
+        response = "You can ask me for the time, today's date, open YouTube, open Google, search for something, or calculate simple sums.";
+    }
+
+    else {
+        response = "I don't know that command yet. Say help to hear what I can do.";
+    }
+
+    speak(response);
+    addHistory(input, response);
+}
+
+function calculate(expression) {
+    let cleaned = expression.toLowerCase()
+        .replace(/plus/g, "+")
+        .replace(/minus/g, "-")
+        .replace(/multiplied by/g, "*")
+        .replace(/times/g, "*")
+        .replace(/divided by/g, "/")
+        .replace(/over/g, "/")
+        .replace(/x/g, "*")
+        .replace(/[^0-9+\-*/().\s]/g, "")
+        .trim();
+
+    if (!cleaned || !/^[0-9+\-*/().\s]+$/.test(cleaned)) {
+        return null;
+    }
+
+    try {
+        const result = Function('"use strict"; return (' + cleaned + ')')();
+
+        if (typeof result === "number" && Number.isFinite(result)) {
+            return result;
+        }
+
+        return null;
+    } catch (error) {
+        return null;
+    }
+}
+
+function listen() {
+    const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        speak("Voice recognition is not supported in this browser. Please try Google Chrome.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    micButton.disabled = true;
+    message.textContent = "Listening... Speak now.";
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        runCommand(transcript);
+    };
+
+    recognition.onerror = function(event) {
+        if (event.error === "not-allowed") {
+            message.textContent = "Microphone access was blocked. Allow microphone access in your browser settings.";
+        } else {
+            message.textContent = "I couldn't hear you clearly. Please try again.";
+        }
+    };
+
+    recognition.onend = function() {
+        micButton.disabled = false;
+    };
+
+    try {
+        recognition.start();
+    } catch (error) {
+        micButton.disabled = false;
+        message.textContent = "Please wait a moment and try again.";
+    }
+}
+</script></body>
+</html>
