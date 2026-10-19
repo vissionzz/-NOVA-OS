@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NOVA OS</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    width: 360px;
+    min-height: 530px;
+    margin: 0;
+    padding: 20px;
+    background: #070707;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #522020;
+    padding-bottom: 15px;
+}
+
+.logo {
+    color: #ff3939;
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 4px;
+}
+
+.status {
+    color: #45ff9a;
+    font-size: 10px;
+}
+
+.reactor {
+    width: 125px;
+    height: 125px;
+    margin: 25px auto;
+    border: 3px solid #ff3333;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 22px #ff222244;
+    animation: pulse 2s infinite alternate;
+}
+
+.core {
+    width: 80px;
+    height: 80px;
+    border: 4px solid #ffc44d;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffc44d;
+    font-size: 25px;
+    font-weight: bold;
+    box-shadow: inset 0 0 15px #ffc44d44;
+}
+
+@keyframes pulse {
+    from {
+        box-shadow: 0 0 10px #ff222222;
+    }
+    to {
+        box-shadow: 0 0 30px #ff222277;
+    }
+}
+
+h1 {
+    text-align: center;
+    color: #ff3939;
+    letter-spacing: 5px;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #888;
+    font-size: 10px;
+    letter-spacing: 2px;
+}
+
+#statusMessage {
+    text-align: center;
+    color: #ffc44d;
+    min-height: 35px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+#activate {
+    width: 100%;
+    padding: 14px;
+    color: white;
+    background: linear-gradient(120deg, #ff3939, #9b0000);
+    border: 1px solid #ff7777;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#activate:hover {
+    box-shadow: 0 0 18px #ff333355;
+}
+
+#activate:disabled {
+    opacity: 0.6;
+}
+
+.chat {
+    margin-top: 20px;
+    border: 1px solid #492020;
+    border-radius: 8px;
+    padding: 12px;
+    background: #101010;
+}
+
+.chat h3 {
+    color: #ff4545;
+    font-size: 13px;
+    margin-top: 0;
+}
+
+#conversation {
+    height: 105px;
+    overflow-y: auto;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #ddd;
+    overflow-wrap: anywhere;
+}
+
+.inputRow {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+#userInput {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    background: #1b1b1b;
+    border: 1px solid #444;
+    border-radius: 5px;
+    color: white;
+}
+
+#send {
+    background: #a80000;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    padding: 0 13px;
+    cursor: pointer;
+}
+
+.quick {
+    display: flex;
+    gap: 7px;
+    margin-top: 12px;
+}
+
+.quick button {
+    flex: 1;
+    padding: 9px 3px;
+    background: #181818;
+    color: #eee;
+    border: 1px solid #522020;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    color: #555;
+    font-size: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">NOVA OS</div>
+    <div class="status">● SYSTEM READY</div>
+</header>
+
+<div class="reactor">
+    <div class="core">N</div>
+</div>
+
+<h1>NOVA</h1>
+<p class="subtitle">PERSONAL AI ASSISTANT</p>
+
+<p id="statusMessage">
+    Hello! Press the button and speak to me.
+</p>
+
+<button id="activate">🎙️ ACTIVATE NOVA</button>
+
+<div class="quick">
+    <button data-command="time">🕒 TIME</button>
+    <button data-command="date">📅 DATE</button>
+    <button data-command="open YouTube">▶ YOUTUBE</button>
+    <button data-command="help">❔ HELP</button>
+</div>
+
+<div class="chat">
+    <h3>NOVA COMMUNICATIONS</h3>
+
+    <div id="conversation">
+        <div><b>NOVA:</b> All systems ready. How can I help?</div>
+    </div>
+
+    <div class="inputRow">
+        <input
+            id="userInput"
+            type="text"
+            placeholder="Type a command..."
+            autocomplete="off"
+        >
+        <button id="send">SEND</button>
+    </div>
+</div>
+
+<footer>
+    NOVA OS · VERSION 2.0
+</footer>
+
+<script>
+const statusMessage = document.getElementById("statusMessage");
+const activateButton = document.getElementById("activate");
+const conversation = document.getElementById("conversation");
+const userInput = document.getElementById("userInput");
+
+function displayMessage(who, text) {
+    const line = document.createElement("div");
+    const label = document.createElement("b");
+
+    label.textContent = who + ": ";
+    line.appendChild(label);
+    line.appendChild(document.createTextNode(text));
+
+    conversation.appendChild(line);
+    conversation.scrollTop = conversation.scrollHeight;
+}
+
+function speak(text) {
+    statusMessage.textContent = text;
+
+    if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.rate = 1;
+        utterance.pitch = 1;
+
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+function openWebsite(url) {
+    chrome.tabs.create({ url: url });
+}
+
+function calculate(expression) {
+    let cleaned = expression.toLowerCase()
+        .replace(/multiplied by/g, "*")
+        .replace(/divided by/g, "/")
+        .replace(/plus/g, "+")
+        .replace(/minus/g, "-")
+        .replace(/times/g, "*")
+        .replace(/over/g, "/")
+        .replace(/x/g, "*")
+        .replace(/[^0-9+\-*/().\s]/g, "")
+        .trim();
+
+    if (!cleaned ||
+        !/^[0-9+\-*/().\s]+$/.test(cleaned)) {
+        return null;
+    }
+
+    try {
+        const answer = Function(
+            '"use strict"; return (' + cleaned + ')'
+        )();
+
+        return typeof answer === "number" &&
+            Number.isFinite(answer) ? answer : null;
+    } catch (error) {
+        return null;
+    }
+}
+
+function runCommand(input) {
+    const original = input.trim();
+    const command = original.toLowerCase();
+
+    if (!original) return;
+
+    displayMessage("YOU", original);
+
+    let response;
+
+    if (
+        command.includes("hello") ||
+        command.includes("hi nova")
+    ) {
+        response = "Hello! I'm NOVA. What can I do for you?";
+    }
+
+    else if (command.includes("time")) {
+        response = "The time is " +
+            new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+    }
+
+    else if (
+        command.includes("date") ||
+        command.includes("today")
+    ) {
+        response = "Today is " +
+            new Date().toLocaleDateString([], {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            });
+    }
+
+    else if (command.includes("open youtube")) {
+        response = "Opening YouTube.";
+        openWebsite("https://www.youtube.com/");
+    }
+
+    else if (command.includes("open google")) {
+        response = "Opening Google.";
+        openWebsite("https://www.google.com/");
+    }
+
+    else if (command.includes("open gmail")) {
+        response = "Opening Gmail.";
+        openWebsite("https://mail.google.com/");
+    }
+
+    else if (command.includes("search for ")) {
+        const query = original.substring(
+            command.indexOf("search for ") + 11
+        );
+
+        response = "Searching Google for " + query;
+
+        openWebsite(
+            "https://www.google.com/search?q=" +
+            encodeURIComponent(query)
+        );
+    }
+
+    else if (
+        command.startsWith("calculate ") ||
+        command.startsWith("what is ")
+    ) {
+        const expression = original
+            .replace(/^calculate\s+/i, "")
+            .replace(/^what is\s+/i, "");
+
+        const answer = calculate(expression);
+
+        response = answer === null
+            ? "I couldn't calculate that. Try saying calculate 12 plus 5."
+            : "The answer is " + answer;
+    }
+
+    else if (command.includes("help")) {
+        response = "I can tell you the time and date, open websites, search Google, and calculate simple sums. General AI conversations need an AI service connection.";
+    }
+
+    else {
+        response = "I don't know that command yet. You can ask for the time, date, a calculation, or a website.";
+    }
+
+    displayMessage("NOVA", response);
+    speak(response);
+}
+
+activateButton.addEventListener("click", function() {
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+        speak("Voice recognition is unavailable here. Please try Chrome on your Chromebook.");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    activateButton.disabled = true;
+    statusMessage.textContent = "Listening... Speak now.";
+
+    recognition.onresult = function(event) {
+        runCommand(event.results[0][0].transcript);
+    };
+
+    recognition.onerror = function(event) {
+        const message = event.error === "not-allowed"
+            ? "Microphone permission was denied."
+            : "I couldn't hear you. Please try again.";
+
+        statusMessage.textContent = message;
+    };
+
+    recognition.onend = function() {
+        activateButton.disabled = false;
+    };
+
+    try {
+        recognition.start();
+    } catch (error) {
+        activateButton.disabled = false;
+        statusMessage.textContent = "Please try again.";
+    }
+});
+
+document.getElementById("send").addEventListener("click", function() {
+    runCommand(userInput.value);
+    userInput.value = "";
+});
+
+userInput.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        runCommand(userInput.value);
+        userInput.value = "";
+    }
+});
+
+document.querySelectorAll("[data-command]").forEach(function(button) {
+    button.addEventListener("click", function() {
+        runCommand(button.dataset.command);
+    });
+});
+</script>
+
+</body>
+</html>
