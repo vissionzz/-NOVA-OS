@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "NOVA OS Assistant",
+  "version": "1.0.0",
+  "description": "Your personal futuristic voice assistant.",
+  "permissions": [
+    "storage"
+  ],
+  "action": {
+    "default_title": "Open NOVA OS",
+    "default_popup": "popup.html"
+  },
+  "commands": {
+    "open-nova": {
+      "suggested_key": {
+        "default": "Ctrl+Space",
+        "chromeos": "Ctrl+Space"
+      },
+      "description": "Activate NOVA OS"
+    }
+  }
+}
