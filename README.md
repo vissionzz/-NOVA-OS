@@ -1,0 +1,2 @@
+# -NOVA-OS
+ My personal AI-powered voice assistant for Chromebook.
