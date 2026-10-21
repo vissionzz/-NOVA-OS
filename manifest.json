@@ -1,10 +1,13 @@
 {
   "manifest_version": 3,
   "name": "NOVA OS Assistant",
-  "version": "1.0.0",
-  "description": "Your personal futuristic voice assistant.",
+  "version": "1.1.0",
+  "description": "Your personal futuristic AI voice assistant.",
   "permissions": [
     "storage"
+  ],
+  "host_permissions": [
+    "https://purple-fog-d2ef.kuyorodesmond560.workers.dev/*"
   ],
   "action": {
     "default_title": "Open NOVA OS",
